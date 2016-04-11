@@ -35,13 +35,14 @@ import com.wisnu.photohunting.ui.activity.PhotoActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit.Callback;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 public class PhotoFeedFragment extends Fragment {
     private SwipeRefreshLayout mRefresh;
-    private List<Photo> mPhotoPostList;
-    private PhotoFeedAdapter mPhotoAdapter;
+    private List<Photo>        mPhotoPostList;
+    private PhotoFeedAdapter   mPhotoAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -70,7 +71,7 @@ public class PhotoFeedFragment extends Fragment {
         mPhotoAdapter.onItemClickedListener(new PhotoFeedAdapter.onClickListener() {
             @Override
             public void onActionClickView(int itemCode, String pid) {
-                User user = UserData.getInstance().getUser();
+                User   user   = UserData.getInstance().getUser();
                 String userId = user.getUserId();
                 switch (itemCode) {
                     case PhotoFeedAdapter.ITEM_COUNT_LIKE:
@@ -148,7 +149,7 @@ public class PhotoFeedFragment extends Fragment {
         mRefresh.setRefreshing(true);
         Request.Photo.get_all().enqueue(new Callback<Response.Photo>() {
             @Override
-            public void onResponse(retrofit.Response<Response.Photo> response, Retrofit retrofit) {
+            public void onResponse(Call<Response.Photo> call, retrofit2.Response<Response.Photo> response) {
                 mRefresh.setRefreshing(false);
                 if (mPhotoPostList != null) {
                     mPhotoPostList.clear();
@@ -160,7 +161,7 @@ public class PhotoFeedFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Throwable t) {
+            public void onFailure(Call<Response.Photo> call, Throwable t) {
                 mRefresh.setRefreshing(false);
                 Utils.showOnConsole("PhotoFeedFragment", "onFailure : " + t.getLocalizedMessage());
                 Utils.showToast(getActivity(), "Server tidak merespon, coba beberapa saat lagi");
@@ -178,7 +179,7 @@ public class PhotoFeedFragment extends Fragment {
         Request.Photo.add_like(photoId, userId).
                 enqueue(new Callback<Response.Basic>() {
                     @Override
-                    public void onResponse(retrofit.Response<Response.Basic> response, Retrofit retrofit) {
+                    public void onResponse(Call<Response.Basic> call, retrofit2.Response<Response.Basic> response) {
                         if (response.body().getData() != null) {
                             if (!response.body().getStatus().equals("false")) {
                                 Utils.showToast(getActivity(), "Anda menyukai foto ini");
@@ -189,7 +190,7 @@ public class PhotoFeedFragment extends Fragment {
                     }
 
                     @Override
-                    public void onFailure(Throwable t) {
+                    public void onFailure(Call<Response.Basic> call, Throwable t) {
                         Utils.showOnConsole("PhotoFeedFragment", "onFailure : " + t.getLocalizedMessage());
                     }
                 });

@@ -12,8 +12,10 @@ import com.wisnu.photohunting.R;
 import com.wisnu.photohunting.network.Request;
 import com.wisnu.photohunting.network.Response;
 
-import retrofit.Callback;
-import retrofit.Retrofit;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+
 
 public class RegisterActivity extends AppCompatActivity {
     private EditText edName;
@@ -39,23 +41,24 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void submit() {
-        String nama = edName.getText().toString();
-        String email = edEmail.getText().toString();
-        String password = edPassword.getText().toString();
+        String nama       = edName.getText().toString();
+        String email      = edEmail.getText().toString();
+        String password   = edPassword.getText().toString();
         String copassword = edCoPassword.getText().toString();
 
         Request.User.register(nama, email, password, copassword).
                 enqueue(new Callback<Response.Basic>() {
                     @Override
-                    public void onResponse(retrofit.Response<Response.Basic> response, Retrofit retrofit) {
-                        if (response.body().getStatus() != null) onSuccess();
-                        else onFailed();
+                    public void onResponse(Call<Response.Basic> call, retrofit2.Response<Response.Basic> response) {
+                        if (response.isSuccessful())
+                            if (response.body().getStatus() != null) onSuccess();
+                            else onFailed();
 
                         startActivity(new Intent(RegisterActivity.this, SignInActivity.class));
                     }
 
                     @Override
-                    public void onFailure(Throwable t) {
+                    public void onFailure(Call<Response.Basic> call, Throwable t) {
                         onFailed();
                     }
                 });
